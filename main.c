@@ -11,11 +11,12 @@
  *
  */
 
+#include <stdio.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <util/twi.h>
-#include <stdio.h>
+#include <stdlib.h>
 
 #ifndef F_CPU
 	#define F_PCU 16000000UL
@@ -47,13 +48,12 @@
 
 
 volatile uint32_t timer1;
-struct {
+volatile struct {
 	uint8_t forward;
 	uint8_t reverse;
 	uint8_t calculated;
 }humidity;
 volatile signed char inc = 1;//heartbeat increment
-
 volatile const uint32_t half_day = 10676; // ~12 hours
 
 void port_config(void)
@@ -135,7 +135,6 @@ ISR(TIMER2_OVF_vect)
 	if (OCR2A == 254 || OCR2A == 0)
 	{
 		inc = inc * -1;
-		//PORTB ^= (1<<PB5);
 	}
 }
 
@@ -144,7 +143,7 @@ ISR(INT0_vect)
 	timer1 = half_day - 1;
 	#ifdef DEBUG
 		printf("Button pressed!\n");
-		printf("Timer1: %lu, %lu\n", timer1,half_day);
+		printf("Timer1: %lu\n", timer1);
 	#endif
 
 }
