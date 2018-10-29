@@ -25,9 +25,6 @@
  */
 #define DEBUG true //UART and/or i2c debug output
 #ifdef DEBUG
-	#include "i2cmaster.h" //Fleury i2c lib
-	#include "lcd.h" //Fleury lcd lib
-	extern void lcd_backlight(char on);    //not in lcd.h
 	#include "uart.h"
 #endif
 
@@ -80,17 +77,6 @@ void port_config(void)
 	TCCR2B |= (1<<CS22)|(1<<CS21);//|(1<<CS20);
 	// b111 - /1024 prescaler
 	TIMSK2 |= (1<<TOIE2);
-
-
-
-//	Config TWI from gnu-avr example
-	  /* initialize TWI clock: 100 kHz clock, TWPS = 0 => prescaler = 1 */
-	#if defined(TWPS0)
-	  /*has prescaler (mega128 & newer)*/
-	  TWSR = 0;
-	#endif
-	TWBR = (F_CPU / 100000UL - 16) / 2;
-	TWCR |= (1<<TWEN)|(1<<TWIE); //Enable TWI
 }
 
 
@@ -159,25 +145,8 @@ int main(void)
 
 	#ifdef DEBUG
 		printf("Auto irrigation system is started\n");
-
-		// Init LCD1602
-		lcd_init(LCD_ON_DISPLAY);
-		lcd_backlight(1);
-		_delay_ms(500);
-		lcd_backlight(0);
-		_delay_ms(500);
-		lcd_backlight(1);
-		_delay_ms(500);
-
-		lcd_clrscr();
-		lcd_gotoxy(0, 0);
-		lcd_puts_P("Auto irrigation");
-		lcd_gotoxy(0, 1);
-		lcd_puts("Hm:");
-		_delay_ms(1000);
 	#endif
 
-	char hmdty_string[16];
 	while(1)
 	{
 		if (timer1 >= half_day)
@@ -188,15 +157,6 @@ int main(void)
 			humidity.reverse = check_humidity(1); //checking with reversed polarity for prevent electrodes degradation
 			humidity.calculated = (humidity.forward + humidity.reverse) / 2;
 			#ifdef DEBUG
-				itoa(humidity.forward, hmdty_string, 10);
-				lcd_gotoxy(4, 1);
-				lcd_puts(hmdty_string);
-				itoa(humidity.reverse, hmdty_string, 10);
-				lcd_gotoxy(8, 1);
-				lcd_puts(hmdty_string);
-				itoa(humidity.calculated, hmdty_string, 10);
-				lcd_gotoxy(13, 1);
-				lcd_puts(hmdty_string);
 				printf("Humidity:%d %d %d\n", humidity.forward, humidity.reverse, humidity.calculated);
 			#endif
 			if (humidity.calculated < 128)
