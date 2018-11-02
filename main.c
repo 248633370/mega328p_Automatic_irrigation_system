@@ -63,12 +63,12 @@ void port_config(void)
 	TCCR1B |= (1<<CS12)|(1<<CS10);//set clk/1024 prescaler, period 64us timer1
 	TIMSK1 |= (1<<ICIE1)|(1<<TOIE1);// enable timer1 interrupt
 
-	ADMUX |= (1<<ADLAR)
-			|(1<<REFS0);// set left adjusted result 10-bit ADC // set ref as AVCC
+	ADMUX |= (1<<ADLAR) // set left adjusted result 10-bit ADC
+			|(1<<REFS0);// set ref as AVCC
 	ADCSRA |= (1<<ADEN)|(1<<ADSC) // enable ADC
 		|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0); // Prescaler /128
 
-	MOTOR_REGISTER |=(1<<MOTOR_PIN)|(1<<HERATBEAT_PIN);// set ports as out
+	MOTOR_REGISTER |= (1<<MOTOR_PIN)|(1<<HERATBEAT_PIN);// set ports as out
 	// set Fast PWM
 	TCCR2A |= (1<<COM2A1)|(1<<COM2A0)
 			|(1<<WGM21)|(1<<WGM20);
@@ -130,7 +130,7 @@ ISR(INT0_vect)
 	timer1 = half_day - 1;
 	#ifdef DEBUG
 		printf("Button pressed!\n");
-		printf("Timer1: %lu, %lu\n", timer1,half_day);
+		printf("Timer1: %lu\n", timer1);
 	#endif
 
 }
@@ -164,7 +164,7 @@ int main(void)
 				#ifdef DEBUG
 					printf("Start ATX(1 sec)\n");
 				#endif
-				SENSOR_PORT |= ~(1<<ATX_PIN);
+				SENSOR_PORT |= (1<<ATX_PIN);
 				_delay_ms(1000); //delay for 1 second during ATX start
 				#ifdef DEBUG
 					printf("irrigation 10 sec\n");
